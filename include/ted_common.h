@@ -50,6 +50,7 @@ ted_connection_t;
 typedef struct {
 	unsigned short verbose;
 	unsigned short notify;
+	unsigned int   notification_time;
 	char           syslog[0xFF];
 	unsigned int   poll_delay;
 	

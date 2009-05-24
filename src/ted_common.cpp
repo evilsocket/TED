@@ -50,6 +50,7 @@ void ted_init( ted_context_t *ted ){
 	ted->poll_delay = 500 * 1000;	
 	ted->verbose    = 1;
 	ted->notify     = 1;
+	ted->notification_time = 1000;
 	ted->connection = NULL;
 }
 
@@ -64,6 +65,7 @@ void ted_event_notification( unsigned short event, void *args ){
 
 	switch( event ){
 		case TED_EVENT_CONNECTION :
+			// TODO: Check last connection event and skip if equal to prevent DOS attacks
 			sprintf( message,
 					"New connection from %s to port %s on %s .", 
 					 ted->connection->source,
@@ -77,11 +79,12 @@ void ted_event_notification( unsigned short event, void *args ){
 			if( ted->notify ){
 				n = notify_notification_new( "TED - Notification", 
 											 message,
+											 // TODO: Add an icon 
 											 NULL, 
 											 NULL );
 											 
-				notify_notification_set_timeout(n, 5000);
-				notify_notification_show(n, NULL);
+				notify_notification_set_timeout( n, ted->notification_time );
+				notify_notification_show( n, NULL );
 			}
 	
 		break;
