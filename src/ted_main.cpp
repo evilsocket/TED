@@ -18,13 +18,18 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "ted_tcpmon.h"
+#include "ted_arpmon.h"
+#include "ted_log.h"
 
 int main( int argc, char **argv ){
 	ted_context_t  ted;
 	
+	ted_log( "Network event daemon started .\n" );
+	
 	ted_init(&ted);
 	
 	ted_start_tcpmon(&ted);
+	ted_start_arpmon(&ted);
 	
 	while( 1 ){
 		sleep(1);

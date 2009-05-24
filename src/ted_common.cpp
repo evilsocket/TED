@@ -20,6 +20,7 @@
 #include "ted_common.h"
 
 extern unsigned short ted_isfile( char *path );
+extern void ted_log( const char *format, ... );
 
 void ted_die( const char *format, ... ){
 	va_list arg_ptr ;
@@ -47,10 +48,12 @@ void ted_get_syslog( char *syslog ){
 
 void ted_init( ted_context_t *ted ){
 	ted_get_syslog( ted->syslog );
+	ted->device     = strdup("eth0");
 	ted->poll_delay = 500 * 1000;	
+	ted->arp_delay  = 5000 * 1000;
 	ted->verbose    = 1;
 	ted->notify     = 1;
-	ted->notification_time = 1000;
+	ted->notification_time = 5000;
 	ted->connection = NULL;
 }
 
@@ -67,17 +70,18 @@ void ted_event_notification( unsigned short event, void *args ){
 		case TED_EVENT_CONNECTION :
 			// TODO: Check last connection event and skip if equal to prevent DOS attacks
 			sprintf( message,
-					"New connection from %s to port %s on %s .", 
+					"New connection from %s to port %s .", 
 					 ted->connection->source,
-					 ted->connection->port,
-					 ted->connection->datetime );
+					 ted->connection->port );
+			
+			ted_log( "%s\n", message );
 			
 			if( ted->verbose ){
 				printf( "%s\n", message );
 			}
 			
 			if( ted->notify ){
-				n = notify_notification_new( "TED - Notification", 
+				n = notify_notification_new( "Network Event", 
 											 message,
 											 // TODO: Add an icon 
 											 NULL, 
@@ -86,7 +90,30 @@ void ted_event_notification( unsigned short event, void *args ){
 				notify_notification_set_timeout( n, ted->notification_time );
 				notify_notification_show( n, NULL );
 			}
-	
+		break;
+		
+		case TED_EVENT_NEW_HOST :
+			sprintf( message,
+					"New host detected : %s [%s] .", 
+					 ted->endpoint->address(),
+					 ted->endpoint->hardware() );
+			
+			ted_log( "%s\n", message );
+			
+			if( ted->verbose ){
+				printf( "%s\n", message );
+			}
+			
+			if( ted->notify ){
+				n = notify_notification_new( "Network Event", 
+											 message,
+											 // TODO: Add an icon 
+											 NULL, 
+											 NULL );
+											 
+				notify_notification_set_timeout( n, ted->notification_time );
+				notify_notification_show( n, NULL );
+			}
 		break;
 	}
 	

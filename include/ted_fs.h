@@ -26,6 +26,5 @@ unsigned short ted_isfile( char *path );
 unsigned long  ted_fsize( char *path );
 unsigned int   ted_last_lines( char *path, unsigned long offset, ted_linelist_t *lines );
 
-
 #endif
 
