@@ -70,7 +70,8 @@ void *ted_tcpmon_thread( void *arg ){
 				if( ted_is_connection( lines[i].c_str() ) ){
 					ted_connection_t connection;
 					ted_parse_connection( lines[i].c_str(), &connection );
-					ted_event_notification( TED_EVENT_CONNECTION, &connection );
+					ted->connection = &connection;
+					ted_event_notification( TED_EVENT_CONNECTION, ted );
 				}	
 			}
 		}

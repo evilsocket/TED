@@ -40,19 +40,25 @@ using std::string;
 typedef vector<string> ted_linelist_t;
 
 typedef struct {
-	unsigned short verbose;
-	char           syslog[0xFF];
-	unsigned int   poll_delay;
-}
-ted_context_t;
-
-typedef struct {
 	char datetime[0xFF];
 	char protocol[0xFF];
 	char source[0xFF];
 	char port[0xFF];
 }
 ted_connection_t;
+
+typedef struct {
+	unsigned short verbose;
+	unsigned short notify;
+	char           syslog[0xFF];
+	unsigned int   poll_delay;
+	
+	/* events data */
+	ted_connection_t *connection;
+}
+ted_context_t;
+
+
 
 void ted_die( const char *format, ... );
 void ted_init( ted_context_t *ted );

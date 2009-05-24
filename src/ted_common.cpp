@@ -49,39 +49,45 @@ void ted_init( ted_context_t *ted ){
 	ted_get_syslog( ted->syslog );
 	ted->poll_delay = 500 * 1000;	
 	ted->verbose    = 1;
+	ted->notify     = 1;
+	ted->connection = NULL;
 }
 
 void ted_event_notification( unsigned short event, void *args ){
-	ted_connection_t   *connection = NULL;
+	ted_context_t      *ted = (ted_context_t *)args;
 	NotifyNotification *n = NULL;  
 	char                message[0xFF] = {0};
-
-    notify_init("TED");
+	
+	if( ted->notify ){
+    	notify_init("TED");
+	}
 
 	switch( event ){
 		case TED_EVENT_CONNECTION :
-			connection = (ted_connection_t *)args;
-			
 			sprintf( message,
 					"New connection from %s to port %s on %s .", 
-					 connection->source,
-					 connection->port,
-					 connection->datetime );
+					 ted->connection->source,
+					 ted->connection->port,
+					 ted->connection->datetime );
 			
-			printf( "%s\n", message );
-					 
-			n = notify_notification_new( "TED - Notification", 
-										 message,
-								         NULL, 
-										 NULL );
-										 
-			notify_notification_set_timeout(n, 5000);
-			notify_notification_show(n, NULL);
+			if( ted->verbose ){
+				printf( "%s\n", message );
+			}
+			
+			if( ted->notify ){
+				n = notify_notification_new( "TED - Notification", 
+											 message,
+											 NULL, 
+											 NULL );
+											 
+				notify_notification_set_timeout(n, 5000);
+				notify_notification_show(n, NULL);
+			}
 	
 		break;
 	}
 	
-	if( n ){
+	if( ted->notify && n ){
 		g_object_unref(G_OBJECT(n));	
 	}
 }
